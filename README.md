@@ -1,68 +1,94 @@
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is a minimal reproduction case for a regression in eslint-module-utils@2.3.0, causing invalid `Resolve error: webpack with invalid interface loaded as resolver` errors to be emitted at runtime.
 
-## Available Scripts
+As demonstrated by `npm run demo`, reverting to eslint-module-utils@2.2.0 inside `node_modules/eslint-plugin-import` fixes the issue.
 
-In the project directory, you can run:
+Here is the full output of `npm run demo` on my machine:
 
-### `npm start`
+```bash
+11:41:16 ~/repro-eslint-bug-cra (master|✔) npm run demo
 
-Runs the app in the development mode.<br>
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+> repro-eslint-bug-cra@0.1.0 demo /home/ronanj/repro-eslint-bug-cra
+> rm -rf ./node_modules && npm run --silent 1_failedstate; npm run --silent 2_workingstate; npm run --silent 3_summary
 
-The page will reload if you make edits.<br>
-You will also see any lint errors in the console.
+***** FAILED STATE *****
+added 1896 packages in 6.629s
 
-### `npm test`
+/home/ronanj/repro-eslint-bug-cra/src/App.js  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/namespace  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/no-unresolved
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/named
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/default
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-duplicates
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default-member
+  1:34  error    Unable to resolve path to module 'react'                          import/no-unresolved
+  2:18  error    Unable to resolve path to module './logo.svg'                     import/no-unresolved
+  3:8   error    Unable to resolve path to module './App.css'                      import/no-unresolved
 
-Launches the test runner in the interactive watch mode.<br>
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+/home/ronanj/repro-eslint-bug-cra/src/App.test.js
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/namespace  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/no-unresolved
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/default
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-duplicates
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default-member
+  1:19  error    Unable to resolve path to module 'react'                          import/no-unresolved
+  2:22  error    Unable to resolve path to module 'react-dom'                      import/no-unresolved
+  3:17  error    Unable to resolve path to module './App'                          import/no-unresolved
 
-### `npm run build`
+/home/ronanj/repro-eslint-bug-cra/src/index.js
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/namespace
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-named-as-default-member
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/default
+  1:1   warning  Resolve error: webpack with invalid interface loaded as resolver  import/no-duplicates
+  1:1   error    Resolve error: webpack with invalid interface loaded as resolver  import/no-unresolved
+  1:19  error    Unable to resolve path to module 'react'                          import/no-unresolved
+  2:22  error    Unable to resolve path to module 'react-dom'                      import/no-unresolved
+  3:8   error    Unable to resolve path to module './index.css'                    import/no-unresolved
+  4:17  error    Unable to resolve path to module './App'                          import/no-unresolved
+  5:32  error    Unable to resolve path to module './serviceWorker'                import/no-unresolved
 
-Builds the app for production to the `build` folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.
+✖ 30 problems (21 errors, 9 warnings)
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-### `npm run eject`
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+***** WORKING STATE *****
++ eslint-module-utils@2.2.0
+added 10 packages from 7 contributors and audited 13 packages in 0.785s
+found 0 vulnerabilities
 
-Instead, it will copy all the configuration files and the transitive dependencies (Webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+/home/ronanj/repro-eslint-bug-cra/src/App.js
+  1:34  error  Unable to resolve path to module 'react'       import/no-unresolved
+  2:18  error  Unable to resolve path to module './logo.svg'  import/no-unresolved
+  3:8   error  Unable to resolve path to module './App.css'   import/no-unresolved
 
-## Learn More
+/home/ronanj/repro-eslint-bug-cra/src/App.test.js
+  1:19  error  Unable to resolve path to module 'react'      import/no-unresolved
+  2:22  error  Unable to resolve path to module 'react-dom'  import/no-unresolved
+  3:17  error  Unable to resolve path to module './App'      import/no-unresolved
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+/home/ronanj/repro-eslint-bug-cra/src/index.js
+  1:19  error  Unable to resolve path to module 'react'            import/no-unresolved
+  2:22  error  Unable to resolve path to module 'react-dom'        import/no-unresolved
+  3:8   error  Unable to resolve path to module './index.css'      import/no-unresolved
+  4:17  error  Unable to resolve path to module './App'            import/no-unresolved
+  5:32  error  Unable to resolve path to module './serviceWorker'  import/no-unresolved
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+✖ 11 problems (11 errors, 0 warnings)
 
-### Code Splitting
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/code-splitting
 
-### Analyzing the Bundle Size
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
 
-### Making a Progressive Web App
+***** SUMMARY *****
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app
+- Failed state did yield many `Resolve error: webpack with invalid interface loaded as resolver` errors
 
-### Advanced Configuration
+- Working state (after revert to eslint-module-utils@2.2.0) no longer has these errors
 
-This section has moved here: https://facebook.github.io/create-react-app/docs/advanced-configuration
-
-### Deployment
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/deployment
-
-### `npm run build` fails to minify
-
-This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+Note: there still are import/no-unresolved errors. Please ignore them, they are artifacts of my
+minimal reproduction case and my Webpack-fu is too low to fix them in the Create-React-App webpack
+config. The point remains: failed state with eslint-module-utils@2.3.0 has these `Resolve error`s,
+and working state with eslint-module-utils@2.2.0 no longer has them
+```

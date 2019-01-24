@@ -5,21 +5,28 @@
   "dependencies": {
     "react": "^16.7.0",
     "react-dom": "^16.7.0",
-    "react-scripts": "2.1.3"
+    "react-scripts": "2.1.3",
+    "eslint-plugin-import": "^2.15.0"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "1_failedstate": "echo '***** FAILED STATE *****' && npm ci && npm run lint",
+    "2_workingstate": "echo '\n\n\n\n***** WORKING STATE *****' && cd node_modules/eslint-plugin-import && npm install eslint-module-utils@2.2.0 && cd ../.. && npm run lint",
+    "3_summary": "echo '\n\n\n\n***** SUMMARY *****\n\n- Failed state did yield many `Resolve error: webpack with invalid interface loaded as resolver` errors\n\n- Working state (after revert to eslint-module-utils@2.2.0) no longer has these errors\n\nNote: there still are import/no-unresolved errors. Please ignore them, they are artifacts of my minimal reproduction case and my Webpack-fu is too low to fix them in the Create-React-App webpack config. The point remains: failed state with eslint-module-utils@2.3.0 has these `Resolve error`s, and working state with eslint-module-utils@2.2.0 no longer has them'",
+    "lint": "eslint src",
+    "demo": "rm -rf ./node_modules && npm run --silent 1_failedstate; npm run --silent 2_workingstate; npm run --silent 3_summary"
   },
   "eslintConfig": {
-    "extends": "react-app"
-  },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+    "settings": {
+      "import/resolver": "webpack"
+    },
+    "extends": [
+      "react-app",
+      "plugin:import/errors",
+      "plugin:import/warnings"
+    ]
+  }
 }
